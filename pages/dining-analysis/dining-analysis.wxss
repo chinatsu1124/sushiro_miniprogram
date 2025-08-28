@@ -184,7 +184,7 @@ page {
 
 .result-hint {
   display: block;
-  font-size: 20rpx;
+  font-size: 22rpx;
   color: rgba(255, 255, 255, 0.7);
   margin-top: 8rpx;
   line-height: 1.4;
