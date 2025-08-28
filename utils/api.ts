@@ -70,7 +70,12 @@ class ApiService {
             resolve(res.data)
           } else {
             console.error('API Error:', res.statusCode, res.data)
-            reject(new Error(`HTTP ${res.statusCode}: ${res.data?.message || '服务器错误'}`))
+            // 创建包含错误码的错误对象
+            const error = new Error(`HTTP ${res.statusCode}: ${res.data?.error || res.data?.message || '服务器错误'}`) as any
+            error.statusCode = res.statusCode
+            error.errorCode = res.data?.error_code
+            error.errorData = res.data
+            reject(error)
           }
         },
         fail: (error) => {

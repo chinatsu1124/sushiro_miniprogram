@@ -321,11 +321,12 @@ Component({
           })
           this.showMessage('分析完成', 'success')
         } else {
-          this.showMessage(rawResponse.error || '分析失败', 'error')
+          const errorObj = { message: rawResponse.error || '分析失败' }
+          this.handleDataError(errorObj)
           this.setData({ analysisResult: null, historyData: [] })
         }
       } catch (error: any) {
-        this.showMessage(`分析失败: ${error.message}`, 'error')
+        this.handleDataError(error)
         this.setData({ analysisResult: null })
       } finally {
         this.setData({ loading: false })
@@ -472,6 +473,83 @@ Component({
         query: '',
         imageUrl: '' // 使用默认分享图片
       }
+    },
+
+    // 处理数据加载错误
+    handleDataError(error: any) {
+      let userMessage = ''
+      let messageType = 'error'
+      let showModal = false
+      
+      // 优先使用错误码进行处理
+      if (error.errorCode) {
+        switch (error.errorCode) {
+          case 'STORE_CLOSED':
+            userMessage = '该店铺在选择的日期期间未营业，请尝试选择其他日期查询'
+            messageType = 'warning'
+            showModal = true
+            break
+          case 'NO_QUEUE_NEEDED':
+            userMessage = '该店铺目前不需要排队，您可以直接前往就餐 🎉'
+            messageType = 'success'
+            showModal = true
+            break
+          case 'CALCULATION_ERROR':
+            userMessage = '无法计算统计信息，数据格式可能有问题'
+            messageType = 'error'
+            break
+          default:
+            userMessage = error.message || '未知错误'
+            messageType = 'error'
+        }
+      } else {
+        // 回退到原有的文本匹配方式
+        const errorMessage = error.message || error.toString()
+        userMessage = errorMessage
+        
+        if (errorMessage.includes('该店铺在选择的日期期间未营业')) {
+          userMessage = '该店铺在选择的日期期间未营业，请尝试选择其他日期查询'
+          messageType = 'warning'
+          showModal = true
+        } else if (errorMessage.includes('该店铺目前不需要排队')) {
+          userMessage = '该店铺目前不需要排队，您可以直接前往就餐 🎉'
+          messageType = 'success'
+          showModal = true
+        } else if (errorMessage.includes('网络连接失败') || errorMessage.includes('网络请求失败')) {
+          userMessage = '网络连接失败，请检查网络设置后重试'
+          messageType = 'error'
+        } else if (errorMessage.includes('HTTP 500')) {
+          userMessage = '服务器暂时无法处理请求，请稍后重试'
+          messageType = 'error'
+        } else if (errorMessage.includes('HTTP 422')) {
+          userMessage = '数据查询失败，请检查选择的门店和日期是否正确'
+          messageType = 'warning'
+        } else if (errorMessage.includes('HTTP 404')) {
+          userMessage = '未找到相关数据，请检查门店信息或选择其他日期'
+          messageType = 'warning'
+        }
+      }
+      
+      // 根据错误类型决定显示方式
+      if (showModal) {
+        this.showErrorModal(userMessage, messageType)
+      } else {
+        this.showMessage(userMessage, messageType)
+      }
+    },
+
+    // 显示错误弹窗
+    showErrorModal(message: string, type: string = 'error') {
+      const title = type === 'success' ? '提示' : type === 'warning' ? '注意' : '错误'
+      const icon = type === 'success' ? 'success' : type === 'warning' ? 'none' : 'error'
+      
+      wx.showModal({
+        title: title,
+        content: message,
+        showCancel: false,
+        confirmText: '知道了',
+        confirmColor: type === 'success' ? '#07c160' : type === 'warning' ? '#ff9500' : '#fa5151'
+      })
     },
 
     // 显示消息
