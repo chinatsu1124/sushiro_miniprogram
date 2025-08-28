@@ -1,0 +1,120 @@
+<!--dining-analysis.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 门店选择区域 -->
+    <view class="controls">
+      <view class="form-group">
+        <text class="label">地区</text>
+        <picker bindchange="onRegionChange" value="{{regionIndex}}" range="{{regions}}" disabled="{{loading}}">
+          <view class="picker-text">{{regions[regionIndex] || '请选择地区'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">门店</text>
+        <picker bindchange="onStoreChange" value="{{storeIndex}}" range="{{storeNames}}" disabled="{{loading || !selectedRegion}}">
+          <view class="picker-text">{{selectedStore ? selectedStore.name : '请选择门店'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">期望就餐时间</text>
+        <picker mode="time" value="{{diningTime}}" start="10:30" end="22:00" bindchange="onDiningTimeChange">
+          <view class="picker-text">{{diningTime || '请选择时间'}}</view>
+        </picker>
+        <text class="time-note">营业时间：10:30 - 22:00</text>
+      </view>
+
+      <button class="btn primary" bindtap="analyzeDiningTime" disabled="{{loading || !selectedStore || !diningTime}}">
+        <text wx:if="{{loading}}">📊 分析中...</text>
+        <text wx:else>📊 开始分析</text>
+      </button>
+    </view>
+
+    <!-- 分析结果 -->
+    <view class="analysis-result" wx:if="{{analysisResult}}">
+      <view class="result-header">
+        <text class="result-title">📋 分析结果</text>
+        <text class="result-subtitle">基于历史数据的智能分析</text>
+      </view>
+
+      <!-- 预计取号时间信息 -->
+      <view class="result-card primary">
+        <view class="result-icon">🎫</view>
+        <view class="result-content">
+          <text class="result-value">{{analysisResult.estimatedIssueTime || '-'}}</text>
+          <text class="result-label">预计取号时间</text>
+          <text class="result-hint">如果您查询的门店开放了线上取号，该预测可能会偏晚，建议您提前取号</text>
+        </view>
+      </view>
+
+      <!-- 历史数据统计 -->
+      <view class="history-stats">
+        <text class="stats-title">📊 历史数据统计</text>
+        <view class="stats-grid">
+          <view class="stat-item">
+            <text class="stat-value">{{analysisResult.avgIssueTime || '-'}}</text>
+            <text class="stat-label">历史平均取号时间</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{analysisResult.earliestIssueTime || '-'}}</text>
+            <text class="stat-label">历史最早取号时间</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{analysisResult.latestIssueTime || '-'}}</text>
+            <text class="stat-label">历史最晚取号时间</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{analysisResult.dataPoints}}天</text>
+            <text class="stat-label">分析天数</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 历史取号时间详情 -->
+      <view class="history-details" wx:if="{{historyData && historyData.length > 0}}">
+        <text class="history-title">📅 历史取号时间详情</text>
+        <view class="history-list">
+          <view class="history-item" wx:for="{{historyData}}" wx:key="date">
+            <view class="history-date">
+              <text class="date-text">{{item.date}}</text>
+              <text class="weekday-text {{item.isWeekend ? 'weekend' : 'weekday'}}" wx:if="{{item.weekday}}">{{item.weekday}}</text>
+            </view>
+            <view class="history-times">
+              <text class="issue-time">取号: {{item.estimated_issue_time}}</text>
+              <text class="wait-time">等待: {{item.waitTime}}分钟</text>
+            </view>
+            <view class="confidence-badge {{item.confidence}}">{{item.confidence === 'high' ? '高信度' : '低信度'}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 最佳时间推荐 -->
+      <view class="best-times" wx:if="{{analysisResult.bestTimes && analysisResult.bestTimes.length > 0}}">
+        <text class="best-times-title">⭐ 推荐就餐时间</text>
+        <view class="times-list">
+          <view class="time-item" wx:for="{{analysisResult.bestTimes}}" wx:key="time">
+            <text class="time-value">{{item.time}}</text>
+            <text class="time-wait">约等{{item.waitTime}}分钟</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据提示 -->
+    <view class="no-data" wx:if="{{!loading && !analysisResult && hasAnalyzed}}">
+      <text class="no-data-title">📋 暂无分析数据</text>
+      <text class="no-data-subtitle">请选择门店和时间后进行分析</text>
+    </view>
+
+    <!-- 消息提示 -->
+    <view class="message {{messageType}}" wx:if="{{message}}">
+      <text>{{message}}</text>
+    </view>
+
+    <!-- 底部占位透明卡片 -->
+    <view class="bottom-spacer">
+      <text style="opacity: 0; font-size: 1rpx;">&nbsp;</text>
+    </view>
+  </view>
+</scroll-view>

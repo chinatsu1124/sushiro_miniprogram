@@ -1,0 +1,97 @@
+<!--index.wxml-->
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 控制面板 -->
+    <view class="controls">
+      <view class="form-group">
+        <text class="label">地区</text>
+        <picker bindchange="onRegionChange" value="{{regionIndex}}" range="{{regions}}" disabled="{{loading}}">
+          <view class="picker-text">{{regions[regionIndex] || '请选择地区'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">门店</text>
+        <picker bindchange="onStoreChange" value="{{storeIndex}}" range="{{storeNames}}" disabled="{{loading || !selectedRegion}}">
+          <view class="picker-text">{{selectedStore ? selectedStore.name : '请选择门店'}}</view>
+        </picker>
+      </view>
+
+      <view class="form-group">
+        <text class="label">查询日期</text>
+        <picker bindchange="onDateChange" value="{{dateIndex}}" range="{{availableDates}}" disabled="{{loading || !selectedStore}}">
+          <view class="picker-text">{{selectedDate || '请选择日期'}}</view>
+        </picker>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="btn-grid">
+        <button class="btn primary" bindtap="loadData" disabled="{{loading || !selectedStore || !selectedDate}}">
+          <text wx:if="{{loading}}">🔄 加载中...</text>
+          <text wx:else>🔄 更新数据</text>
+        </button>
+        <button class="btn" bindtap="setToday">📅 今天</button>
+        <button class="btn" bindtap="setYesterday">📅 昨天</button>
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-div" wx:if="{{loading && !hasData}}">
+      <text class="loading-title">📊 正在加载数据...</text>
+      <text class="loading-subtitle">请稍候，正在从服务器获取数据</text>
+    </view>
+
+    <!-- 数据统计卡片 -->
+    <view class="stats-grid" wx:if="{{hasData}}">
+      <view class="stat-card primary">
+        <text class="stat-value">{{stats.currentQueueCount || '-'}}</text>
+        <text class="stat-label">当前须等待号</text>
+      </view>
+      <view class="stat-card secondary">
+        <text class="stat-value">{{stats.currentWaitTime || '-'}}</text>
+        <text class="stat-label">预计等待时间(分钟)</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{stats.avgCalls || '-'}}</text>
+        <text class="stat-label">平均每分钟叫号</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{stats.maxCalls || '-'}}</text>
+        <text class="stat-label">最高每分钟叫号</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{stats.avgNewTickets || '-'}}</text>
+        <text class="stat-label">平均每分钟新增号</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-value">{{stats.maxNewTickets || '-'}}</text>
+        <text class="stat-label">最高每分钟新增号</text>
+      </view>
+    </view>
+
+    <!-- 网页版图表链接 -->
+    <view class="web-chart-link" wx:if="{{hasData}}">
+      <view class="link-card">
+        <view class="link-header">
+          <text class="link-icon">📊</text>
+          <text class="link-title">详细图表分析</text>
+        </view>
+        <text class="link-subtitle">查看完整的数据趋势图表和深度分析</text>
+        <button class="link-btn" bindtap="openWebChart">
+          🌐 前往网页版图表
+        </button>
+        <text class="link-url">https://sushiro.chinatsu1124.com</text>
+      </view>
+    </view>
+
+    <!-- 消息提示 -->
+    <view class="message {{messageType}}" wx:if="{{message}}">
+      <text>{{message}}</text>
+    </view>
+
+    <!-- 底部占位透明卡片 -->
+    <view class="bottom-spacer">
+      <text style="opacity: 0; font-size: 1rpx;">&nbsp;</text>
+    </view>
+  </view>
+</scroll-view>

@@ -1,0 +1,31 @@
+# Python files
+*.py
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Node modules (if any)
+node_modules/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build files
+dist/
+build/
