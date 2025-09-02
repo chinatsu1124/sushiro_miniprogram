@@ -57,6 +57,14 @@
             <text class="stat-label">历史平均取号时间</text>
           </view>
           <view class="stat-item">
+            <text class="stat-value">{{analysisResult.weekdayAvgIssueTime || '-'}}</text>
+            <text class="stat-label">工作日平均取号时间</text>
+          </view>
+          <view class="stat-item">
+            <text class="stat-value">{{analysisResult.weekendAvgIssueTime || '-'}}</text>
+            <text class="stat-label">周末平均取号时间</text>
+          </view>
+          <view class="stat-item">
             <text class="stat-value">{{analysisResult.earliestIssueTime || '-'}}</text>
             <text class="stat-label">历史最早取号时间</text>
           </view>

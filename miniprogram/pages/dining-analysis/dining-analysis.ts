@@ -5,6 +5,8 @@ import { LocationService, LocationInfo } from '../../utils/location'
 interface AnalysisResult {
   estimatedIssueTime: string
   avgIssueTime: string
+  weekdayAvgIssueTime: string
+  weekendAvgIssueTime: string
   earliestIssueTime: string
   latestIssueTime: string
   dataPoints: number
@@ -312,6 +314,8 @@ Component({
             analysisResult: {
               estimatedIssueTime: issueTimeStats.estimatedIssueTime,
               avgIssueTime: issueTimeStats.avgIssueTime,
+              weekdayAvgIssueTime: rawResponse.statistics?.weekday_avg_issue_time || '-',
+              weekendAvgIssueTime: rawResponse.statistics?.weekend_avg_issue_time || '-',
               earliestIssueTime: issueTimeStats.earliestIssueTime,
               latestIssueTime: issueTimeStats.latestIssueTime,
               dataPoints: highConfidenceData.length,
