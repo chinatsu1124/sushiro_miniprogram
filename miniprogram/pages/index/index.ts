@@ -1,7 +1,6 @@
 // index.ts
 import { apiService, Store, Utils } from '../../utils/api'
 import { DebugUtils } from '../../utils/debug'
-import { LocationService, LocationInfo } from '../../utils/location'
 
 // 获取应用实例
 const app = getApp<IAppOption>()
@@ -42,11 +41,7 @@ Component({
     
     // 分享参数
     shareStoreId: null as number | null,
-    shareDate: null as string | null,
-    
-    // 定位相关
-    locationLoading: false,
-    userLocation: null as LocationInfo | null
+    shareDate: null as string | null
   },
 
   lifetimes: {
@@ -57,94 +52,19 @@ Component({
   },
 
   methods: {
-    // 初始化应用，先尝试定位，然后加载地区
+    // 初始化应用
     async initializeApp() {
       try {
-        // 首先加载地区列表
+        // 加载地区列表
         await this.loadAvailableRegions()
         
-        // 然后尝试自动定位
-        await this.tryAutoLocation()
+        // 设置默认地区为杭州
+        this.setDefaultToHangzhou()
       } catch (error) {
         console.error('应用初始化失败:', error)
         // 如果初始化失败，确保至少显示杭州
         this.setDefaultToHangzhou()
       }
-    },
-
-    // 尝试自动定位
-    async tryAutoLocation() {
-      try {
-        // 静默请求定位权限
-        const hasPermission = await this.requestLocationPermissionSilently()
-        if (!hasPermission) {
-          // 用户拒绝定位，默认显示杭州
-          this.setDefaultToHangzhou()
-          return
-        }
-
-        // 获取用户位置
-        const location = await LocationService.getUserLocation()
-        if (!location) {
-          // 获取位置失败，默认显示杭州
-          this.setDefaultToHangzhou()
-          return
-        }
-
-        this.setData({ userLocation: location })
-
-        // 根据位置选择最近的城市
-        const nearestCity = LocationService.findNearestCity(location, this.data.regions)
-        if (nearestCity) {
-          const cityIndex = this.data.regions.indexOf(nearestCity)
-          if (cityIndex >= 0) {
-            this.setData({
-              regionIndex: cityIndex,
-              selectedRegion: nearestCity
-            })
-            
-            // 保存到全局数据
-            app.setSelectedRegion(nearestCity)
-            
-            // 自动加载该城市的门店
-            await this.loadStoresByRegion(nearestCity)
-            
-            console.log(`自动定位成功，选择城市：${nearestCity}`)
-          } else {
-            this.setDefaultToHangzhou()
-          }
-        } else {
-          this.setDefaultToHangzhou()
-        }
-      } catch (error) {
-        console.error('自动定位失败:', error)
-        this.setDefaultToHangzhou()
-      }
-    },
-
-    // 静默请求定位权限（不显示弹窗）
-    async requestLocationPermissionSilently(): Promise<boolean> {
-      return new Promise((resolve) => {
-        wx.getSetting({
-          success: (res) => {
-            if (res.authSetting['scope.userLocation']) {
-              // 已经授权
-              resolve(true)
-            } else if (res.authSetting['scope.userLocation'] === false) {
-              // 用户之前拒绝过，不再弹窗
-              resolve(false)
-            } else {
-              // 第一次请求授权
-              wx.authorize({
-                scope: 'scope.userLocation',
-                success: () => resolve(true),
-                fail: () => resolve(false)
-              })
-            }
-          },
-          fail: () => resolve(false)
-        })
-      })
     },
 
     // 设置默认为杭州

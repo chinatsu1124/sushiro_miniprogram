@@ -25,14 +25,6 @@
       }
     ]
   },
-  "permission": {
-    "scope.userLocation": {
-      "desc": "您的位置信息将用于选择最近的寿司郎门店"
-    }
-  },
-  "requiredPrivateInfos": [
-    "getLocation"
-  ],
   "style": "v2",
   "componentFramework": "glass-easel",
   "lazyCodeLoading": "requiredComponents"

@@ -279,17 +279,18 @@ page {
   background: #f8f9fa;
   border-radius: 15rpx;
   padding: 20rpx;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   position: relative;
+  gap: 20rpx;
 }
 
 .history-date {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 140rpx;
+  text-align: left;
 }
 
 .date-text {
@@ -317,11 +318,11 @@ page {
 }
 
 .history-times {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 5rpx;
-  margin: 0 20rpx;
+  text-align: center;
+  align-items: center;
 }
 
 .issue-time {
@@ -342,6 +343,8 @@ page {
   border-radius: 10rpx;
   color: white;
   font-weight: bold;
+  display: inline-block;
+  justify-self: end;
 }
 
 .confidence-badge.high {
