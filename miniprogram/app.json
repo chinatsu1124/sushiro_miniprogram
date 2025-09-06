@@ -7,11 +7,11 @@
   "window": {
     "navigationBarTextStyle": "white",
     "navigationBarTitleText": "寿司郎取号小助手",
-    "navigationBarBackgroundColor": "#667eea"
+    "navigationBarBackgroundColor": "#8BB5C0"
   },
   "tabBar": {
     "color": "#666666",
-    "selectedColor": "#667eea",
+    "selectedColor": "#8BB5C0",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
