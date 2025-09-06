@@ -19,7 +19,7 @@
 
       <view class="form-group">
         <text class="label">查询日期</text>
-        <picker bindchange="onDateChange" value="{{dateIndex}}" range="{{availableDates}}" disabled="{{loading || !selectedStore}}">
+        <picker mode="date" bindchange="onDateChange" value="{{selectedDate}}" start="{{dateRangeStart}}" end="{{dateRangeEnd}}" disabled="{{loading || !selectedStore}}">
           <view class="picker-text">{{selectedDate || '请选择日期'}}</view>
         </picker>
       </view>

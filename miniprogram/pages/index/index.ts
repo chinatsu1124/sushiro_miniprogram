@@ -18,8 +18,9 @@ Component({
     selectedStore: null as Store | null,
     
     availableDates: [] as string[],
-    dateIndex: -1,
     selectedDate: '',
+    dateRangeStart: '',
+    dateRangeEnd: '',
     
     // 状态
     loading: false,
@@ -144,6 +145,8 @@ Component({
             selectedStore: null,
             availableDates: [],
             selectedDate: '',
+            dateRangeStart: '',
+            dateRangeEnd: '',
             hasData: false
           })
           
@@ -176,10 +179,16 @@ Component({
         
         const response = await apiService.getDates(storeId)
         if (response.success && response.dates) {
+          // 计算日期范围
+          const dates = response.dates
+          const dateRangeStart = dates.length > 0 ? dates[dates.length - 1] : '' // 最早日期（数组末尾）
+          const dateRangeEnd = dates.length > 0 ? dates[0] : '' // 最新日期（数组开头）
+          
           this.setData({
-            availableDates: response.dates,
-            dateIndex: response.dates.length > 0 ? 0 : -1,
-            selectedDate: response.dates.length > 0 ? response.dates[0] : '',
+            availableDates: dates,
+            selectedDate: dates.length > 0 ? dates[0] : '',
+            dateRangeStart: dateRangeStart,
+            dateRangeEnd: dateRangeEnd,
             hasData: false
           })
           
@@ -208,6 +217,8 @@ Component({
         selectedStore: null,
         availableDates: [],
         selectedDate: '',
+        dateRangeStart: '',
+        dateRangeEnd: '',
         hasData: false
       })
       
@@ -225,6 +236,8 @@ Component({
         selectedStore: store,
         availableDates: [],
         selectedDate: '',
+        dateRangeStart: '',
+        dateRangeEnd: '',
         hasData: false
       })
       
@@ -235,27 +248,36 @@ Component({
 
     // 日期选择
     onDateChange(e: any) {
-      const index = e.detail.value
-      const date = this.data.availableDates[index]
-      this.setData({
-        dateIndex: index,
-        selectedDate: date,
-        hasData: false
-      })
+      const date = e.detail.value
+      // 验证选择的日期是否在可用日期列表中
+      if (this.data.availableDates.includes(date)) {
+        this.setData({
+          selectedDate: date,
+          hasData: false
+        })
+        
+        // 保存到全局数据
+        if (this.data.selectedStore) {
+          app.setSelectedStore(this.data.selectedStore, date)
+        }
+      } else {
+        this.showMessage('所选日期暂无数据，请选择其他日期', 'warning')
+      }
     },
 
     // 设置今天
     setToday() {
       const today = Utils.getToday()
       if (this.data.availableDates.includes(today)) {
-        const index = this.data.availableDates.indexOf(today)
         this.setData({
-          dateIndex: index,
-          selectedDate: today
+          selectedDate: today,
+          hasData: false
         })
         
         // 保存到全局数据
-        app.setSelectedDate(today)
+        if (this.data.selectedStore) {
+          app.setSelectedStore(this.data.selectedStore, today)
+        }
       } else {
         this.showMessage('今天暂无数据', 'warning')
       }
@@ -265,14 +287,15 @@ Component({
     setYesterday() {
       const yesterday = Utils.getYesterday()
       if (this.data.availableDates.includes(yesterday)) {
-        const index = this.data.availableDates.indexOf(yesterday)
         this.setData({
-          dateIndex: index,
-          selectedDate: yesterday
+          selectedDate: yesterday,
+          hasData: false
         })
         
         // 保存到全局数据
-        app.setSelectedDate(yesterday)
+        if (this.data.selectedStore) {
+          app.setSelectedStore(this.data.selectedStore, yesterday)
+        }
       } else {
         this.showMessage('昨天暂无数据', 'warning')
       }
