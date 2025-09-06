@@ -17,11 +17,15 @@
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "🏠 首页"
+        "text": "首页",
+        "iconPath": "images/shouye.png",
+        "selectedIconPath": "images/shouye_selected.png"
       },
       {
         "pagePath": "pages/dining-analysis/dining-analysis",
-        "text": "🍽️ 就餐分析"
+        "text": "就餐分析",
+        "iconPath": "images/fenxi.png",
+        "selectedIconPath": "images/fenxi_selected.png"
       }
     ]
   },
